@@ -19,7 +19,6 @@ import telebot
 API_TOKEN = TG_BOT['TOKEN']
 WEBHOOK_URL = TG_BOT['WEBHOOK_SITE']
 
-telebot.apihelper.proxy = {'https': 'socks5://sockduser:123@blablatdinov.ru:7777'}
 tbot = telebot.TeleBot(API_TOKEN)
 tbot.remove_webhook()
 sleep(0.1)
@@ -54,8 +53,8 @@ def start(message):
 @tbot.message_handler(content_types=['audio', 'photo', 'voice', 'video', 'document', 'text'])
 def admin_spam(message):
     save_message(message)
-    admin = Admin.objects.get(sub__tg_chat_id=message.chat.id)
     if message.chat.id in TG_BOT['admins']:
+        admin = Admin.objects.get(sub__tg_chat_id=message.chat.id)
         if admin.is_spam and message.text != '/spam':
             for sub in Subscriber.objects.all():
                 try:

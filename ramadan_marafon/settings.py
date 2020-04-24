@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '*77y7skq=c+_u_8fm6p1gg(hjeokt#ede&w#ae^u!uyar2jse1'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -37,6 +37,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'django_celery_beat',
+    'djcelery',
+    'django_celery_results',
 
     'bot_init',
     'marathon',
@@ -78,10 +82,20 @@ WSGI_APPLICATION = 'ramadan_marafon.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
+#DATABASES = {
+    #'default': {
+        #'ENGINE': 'django.db.backends.sqlite3',
+        #'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    #}
+#}
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'marathon2020',
+        'USER': 'marathon2020_user',
+        'PASSWORD': '123',
+        'HOST': 'localhost',
+        'PORT': '',
     }
 }
 
@@ -108,9 +122,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru-ru'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Moscow'
 
 USE_I18N = True
 
@@ -123,9 +137,24 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = '/home/www/code/ramadan2020marathon_bot/static/'
 
 TG_BOT = {
     'TOKEN': '1206751008:AAGo8izWqWcTGhRr4nD4efOTkVcoMni_Gwo',  # Токен бота
-    'WEBHOOK_SITE': 'https://948dac07.ngrok.io',  # Адрес для вебхуков
-    'admins': [358610865]
+    'WEBHOOK_SITE': 'https://marathon.blablatdinov.ru',  # Адрес для вебхуков
+    'admins': [358610865, 236565395]
 }
+
+import djcelery
+
+
+CELERY_BROKER_URL = 'redis://localhost:6379/1'
+
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASKS_SERIALIZER = 'json'
+
+
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_CACHE_BACKEND = 'django-cache'
+
+CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'

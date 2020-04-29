@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pytz
 
@@ -8,23 +8,8 @@ from bot_init.models import Subscriber
 
 def check_inst(inst, sub):
     utc = pytz.timezone('Europe/Moscow')
-    ranges = [
-        (datetime(2020, 4, 22, 3), datetime(2020, 4, 23, 3)),
-        (datetime(2020, 4, 23, 3), datetime(2020, 4, 24, 3)),
-        (datetime(2020, 4, 24, 3), datetime(2020, 4, 25, 3)),
-        (datetime(2020, 4, 25, 3), datetime(2020, 4, 26, 3)),
-        (datetime(2020, 4, 26, 3), datetime(2020, 4, 27, 3)),
-        (datetime(2020, 4, 27, 3), datetime(2020, 4, 28, 3)),
-        (datetime(2020, 4, 28, 3), datetime(2020, 4, 29, 3)),
-        (datetime(2020, 4, 29, 3), datetime(2020, 4, 30, 3)),
-        (datetime(2020, 4, 30, 3), datetime(2020, 5, 1, 3)),
-        (datetime(2020, 5, 1, 3), datetime(2020, 5, 2, 3)),
-        (datetime(2020, 5, 2, 3), datetime(2020, 5, 3, 3)),
-        (datetime(2020, 5, 3, 3), datetime(2020, 5, 4, 3)),
-        (datetime(2020, 5, 4, 3), datetime(2020, 5, 5, 3)),
-        (datetime(2020, 5, 5, 3), datetime(2020, 5, 6, 3)),
-        (datetime(2020, 5, 6, 3), datetime(2020, 5, 7, 3)),
-    ]
+    start_date = datetime(2020, 4, 22, 3)
+    ranges = [(start_date + timedelta(days=x), start_date + timedelta(days=x+1)) for x in range(30)]
     points = 0
     points_plus = 1
     for elem in ranges:
@@ -47,8 +32,8 @@ def stat(tg_chat_id):
     sub = Subscriber.objects.get(tg_chat_id=tg_chat_id)
     books = Book.objects.filter(subscriber=sub)
     points_count = 0
-    result = f'Очков за зарядку: {check_inst(Charging, sub)}\n' \
-             f'Очков за чтение Корана: {check_inst(Quran, sub)}\n' \
-             f'Очков за чтение книг: {check_inst(Book, sub)}\n' \
-             f'Очков за самоанализ: {check_inst(SelfAnalyze, sub)}\n'
+    result = f'💪 Очков за зарядку: {check_inst(Charging, sub)}\n' \
+             f'🕋 Очков за чтение Корана: {check_inst(Quran, sub)}\n' \
+             f'📖 Очков за чтение книг: {check_inst(Book, sub)}\n' \
+             f'🧠 Очков за самоанализ: {check_inst(SelfAnalyze, sub)}\n'
     return result

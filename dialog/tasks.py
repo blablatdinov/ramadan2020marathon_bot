@@ -7,10 +7,11 @@ from celery import shared_task
 from celery.task import periodic_task
 from celery.schedules import crontab
 from datetime import timedelta
+from time import sleep
 from bot_init.models import Subscriber
 
 
-@periodic_task(run_every=(crontab(hour=20, minute=0)), name='dialog')
+@periodic_task(run_every=(crontab(hour=22, minute=0)), name='dialog')
 #@periodic_task(run_every=(timedelta(seconds=5)), name='dialog')
 def dialog():
     subs = Subscriber.objects.all()
@@ -20,6 +21,7 @@ def dialog():
         try:
             msg = tbot.send_message(sub.tg_chat_id, 'Сделали ли вы сегодня зарядку?', reply_markup=markup)
             save_message(msg)
+            sleep(0.1)
         except:
             pass
 

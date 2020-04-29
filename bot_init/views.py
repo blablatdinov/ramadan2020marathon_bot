@@ -8,7 +8,7 @@ from django.utils.timezone import make_aware
 from django.views.decorators.csrf import csrf_exempt
 from telebot import types
 
-from bot_init.models import Subscriber, Admin
+from bot_init.models import Subscriber, Admin, Message
 from bot_init.utils import save_message
 from marathon.models import Charging, Quran, Book, SelfAnalyze
 from marathon.services.statist import stat
@@ -29,6 +29,19 @@ button = types.KeyboardButton('Статистика')
 keyboard.row(button)
 
 
+def stop_retry(func):
+
+    def wrapper(message):
+        #if message.chat.id == 358610865:
+        if Message.objects.filter(message_id=message.message_id):
+            print('reply')
+            #return tbot.send_message(message.chat.id,'Привет, админ')
+            return ''
+        return func(message)
+
+    return wrapper
+
+
 @csrf_exempt
 def bot(request):
     if request.content_type == 'application/json':
@@ -42,6 +55,7 @@ def bot(request):
 
 
 @tbot.message_handler(commands=['start'])
+@stop_retry
 def start(message):
     save_message(message)
     Subscriber.objects.get_or_create(tg_chat_id=message.chat.id)
@@ -51,10 +65,14 @@ def start(message):
 
 
 @tbot.message_handler(content_types=['audio', 'photo', 'voice', 'video', 'document', 'text'])
+@stop_retry
 def admin_spam(message):
     save_message(message)
     if message.chat.id in TG_BOT['admins']:
         admin = Admin.objects.get(sub__tg_chat_id=message.chat.id)
+        if message.text == '/subs':
+            msg = tbot.send_message(message.chat.id, Subscriber.objects.all().count())
+            save_message(msg)
         if admin.is_spam and message.text != '/spam':
             for sub in Subscriber.objects.all():
                 try:

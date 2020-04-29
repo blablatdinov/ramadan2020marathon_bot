@@ -107,6 +107,7 @@ def handle_query(call):
     tg_chat_id = call.from_user.id
     data = str(call.data).split(' ')
     sub = Subscriber.objects.get(tg_chat_id=tg_chat_id)
+    #call.message.date = 1588073904
     if 'charge' in data[0]:
         date = make_aware(datetime.fromtimestamp(call.message.date))
         status = True if data[1] == 'yes' else False
